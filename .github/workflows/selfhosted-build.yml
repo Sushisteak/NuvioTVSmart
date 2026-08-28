@@ -13,9 +13,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Write env config
+      - name: Write local.properties
         run: |
-          echo "${{ secrets.NUVIO_TIZEN_ENV_BASE64 }}" | base64 -d > .env
+          cp local.example.properties local.properties
+          sed -i \
+            -e "s|^SUPABASE_URL=.*|SUPABASE_URL=${{ secrets.NUVIO_SUPABASE_URL }}|" \
+            -e "s|^SUPABASE_ANON_KEY=.*|SUPABASE_ANON_KEY=${{ secrets.NUVIO_SUPABASE_ANON_KEY }}|" \
+            -e "s|^TV_LOGIN_REDIRECT_BASE_URL=.*|TV_LOGIN_REDIRECT_BASE_URL=${{ secrets.NUVIO_SUPABASE_URL }}/tv-login|" \
+            -e "s|^AVATAR_PUBLIC_BASE_URL=.*|AVATAR_PUBLIC_BASE_URL=${{ secrets.NUVIO_SUPABASE_URL }}/storage/v1/object/public/avatars|" \
+            local.properties
 
       - run: npm install
       - run: npm run build
