@@ -1,0 +1,28 @@
+name: Selfhosted Tizen Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Write env config
+        run: |
+          echo "${{ secrets.NUVIO_TIZEN_ENV_BASE64 }}" | base64 -d > .env
+
+      - run: npm install
+      - run: npm run build
+      - run: npm run package:tizen
+
+      - name: Upload WGT
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuvio-selfhosted-tizen
+          path: '**/*.wgt'
